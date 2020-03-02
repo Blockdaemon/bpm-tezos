@@ -164,12 +164,12 @@ func NewTezosConfigurator(configFilesAndTemplates map[string]string, pluginParam
 }
 
 func getContainerImage(network string) string {
-	// Not all containers are versioned yet but they will be as soon as there are new commits
+	// TODO: Not all containers are versioned yet but they will be as soon as there are new commits
 	// https://gitlab.com/tezos/tezos/issues/682
 	if network == "mainnet" {
 		return "docker.io/tezos/tezos-bare:master_6d2aa96e_20200212132052"
 	} else if network == "carthagenet" {
-		return "docker.io/tezos/tezos-bare/mainnet:carthagenet"
+		return "docker.io/tezos/tezos-bare:carthagenet"
 	} else if network == "babylonnet" {
 		return "docker.io/tezos/tezos-bare:babylonnet"
 	} else if network == "zeronet" {
