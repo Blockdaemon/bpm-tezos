@@ -235,7 +235,7 @@ func main() {
 	meta := plugin.MetaInfo{
 		Version:         version,
 		Description:     "A tezos package",
-		ProtocolVersion: "1.0.0",
+		ProtocolVersion: "1.1.0",
 		Parameters: []plugin.Parameter{
 			{
 				Name:        "subtype",
