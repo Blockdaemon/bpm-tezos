@@ -148,7 +148,9 @@ func (t TezosConfigurator) RemoveConfig(currentNode node.Node) error {
 		return err
 	}
 
-	return os.Remove(filepath.Join(currentNode.ConfigsDirectory(), "identity.json"))
+	identityDir := filepath.Join(currentNode.ConfigsDirectory(), "identity")
+	fmt.Printf("Removing directory %q\n", identityDir)
+	return os.RemoveAll(identityDir)
 }
 
 func NewTezosConfigurator(configFilesAndTemplates map[string]string, pluginParameters []plugin.Parameter) TezosConfigurator {
