@@ -30,31 +30,37 @@ const (
 // once Tezos provides one universal image/binary for all networks
 type TezosLifecycleHandler struct{}
 
+// Start starts a new tezos node
 func (t TezosLifecycleHandler) Start(currentNode node.Node) error {
 	handler := plugin.NewDockerLifecycleHandler(getContainers(currentNode))
 	return handler.Start(currentNode)
 }
 
+// Stop stops the containers of a tezos node
 func (t TezosLifecycleHandler) Stop(currentNode node.Node) error {
 	handler := plugin.NewDockerLifecycleHandler(getContainers(currentNode))
 	return handler.Stop(currentNode)
 }
 
+// Status returns the status of a tezos node
 func (t TezosLifecycleHandler) Status(currentNode node.Node) (string, error) {
 	handler := plugin.NewDockerLifecycleHandler(getContainers(currentNode))
 	return handler.Status(currentNode)
 }
 
+// RemoveData removes the data of a tezos node
 func (t TezosLifecycleHandler) RemoveData(currentNode node.Node) error {
 	handler := plugin.NewDockerLifecycleHandler(getContainers(currentNode))
 	return handler.RemoveData(currentNode)
 }
 
+// RemoveRuntime removes the containers of a tezos node
 func (t TezosLifecycleHandler) RemoveRuntime(currentNode node.Node) error {
 	handler := plugin.NewDockerLifecycleHandler(getContainers(currentNode))
 	return handler.RemoveRuntime(currentNode)
 }
 
+// NewTezosLifecycleHandler initializes a new instance of TezosLifecycleHandler
 func NewTezosLifecycleHandler() TezosLifecycleHandler {
 	return TezosLifecycleHandler{}
 }
@@ -64,11 +70,13 @@ func NewTezosLifecycleHandler() TezosLifecycleHandler {
 // See TezosLifecycleHandler for the reasoning
 type TezosUpgrader struct{}
 
+// Upgrade upgrades to a new version of the tezos images
 func (t TezosUpgrader) Upgrade(currentNode node.Node) error {
 	upgrader := plugin.NewDockerUpgrader(getContainers(currentNode))
 	return upgrader.Upgrade(currentNode)
 }
 
+// NewTezosUpgrader initializes a new instance of TezosUpgrader
 func NewTezosUpgrader() TezosUpgrader {
 	return TezosUpgrader{}
 }
@@ -78,6 +86,7 @@ type TezosConfigurator struct {
 	plugin.FileConfigurator
 }
 
+// Configure creates the node identity and configuration files for a new tezos node
 func (t TezosConfigurator) Configure(currentNode node.Node) error {
 	if err := t.FileConfigurator.ValidateParameters(currentNode); err != nil {
 		return err
@@ -143,6 +152,7 @@ func (t TezosConfigurator) Configure(currentNode node.Node) error {
 	return err
 }
 
+// RemoveConfig removes the configuration files of a tezos node
 func (t TezosConfigurator) RemoveConfig(currentNode node.Node) error {
 	if err := t.FileConfigurator.RemoveConfig(currentNode); err != nil {
 		return err
@@ -153,6 +163,7 @@ func (t TezosConfigurator) RemoveConfig(currentNode node.Node) error {
 	return os.RemoveAll(identityDir)
 }
 
+// NewTezosConfigurator creates a new instance of TezosConfigurator
 func NewTezosConfigurator(configFilesAndTemplates map[string]string, pluginParameters []plugin.Parameter) TezosConfigurator {
 	fileConfigurator := plugin.NewFileConfigurator(map[string]string{
 		tezosCmdFile: tezosCmdTpl,
