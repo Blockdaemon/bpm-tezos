@@ -1,11 +1,7 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/Blockdaemon/bpm-sdk/pkg/docker"
 	"github.com/Blockdaemon/bpm-sdk/pkg/node"
@@ -15,164 +11,14 @@ import (
 var version string
 
 const (
-	tezosContainerName     = "tezos"
-	tezosInitContainerName = "tezos-init"
-	tezosDataVolumeName    = "tezos-data"
-	tezosCmdFile           = "tezos.dockercmd"
+	tezosContainerName  = "tezos"
+	tezosDataVolumeName = "tezos-data"
+	tezosCmdFile        = "configs/tezos.dockercmd"
 
-	networkName     = "tezos"
-	initNetworkName = "tezos-init"
+	collectorContainerName = "collector"
+	collectorImage         = "docker.io/blockdaemon/tezos-collector:0.5.0"
+	collectorEnvFile       = "configs/collector.env"
 )
-
-// TezosLifecycleHandler makes use of DockerLifecycleHandler to manage containers but calls it with different docker images.
-//
-// This is necessary because Tezos uses different images per network. It's a bit of a hack so hopefully this can go away soon
-// once Tezos provides one universal image/binary for all networks
-type TezosLifecycleHandler struct{}
-
-// Start starts a new tezos node
-func (t TezosLifecycleHandler) Start(currentNode node.Node) error {
-	handler := plugin.NewDockerLifecycleHandler(getContainers(currentNode))
-	return handler.Start(currentNode)
-}
-
-// Stop stops the containers of a tezos node
-func (t TezosLifecycleHandler) Stop(currentNode node.Node) error {
-	handler := plugin.NewDockerLifecycleHandler(getContainers(currentNode))
-	return handler.Stop(currentNode)
-}
-
-// Status returns the status of a tezos node
-func (t TezosLifecycleHandler) Status(currentNode node.Node) (string, error) {
-	handler := plugin.NewDockerLifecycleHandler(getContainers(currentNode))
-	return handler.Status(currentNode)
-}
-
-// RemoveData removes the data of a tezos node
-func (t TezosLifecycleHandler) RemoveData(currentNode node.Node) error {
-	handler := plugin.NewDockerLifecycleHandler(getContainers(currentNode))
-	return handler.RemoveData(currentNode)
-}
-
-// RemoveRuntime removes the containers of a tezos node
-func (t TezosLifecycleHandler) RemoveRuntime(currentNode node.Node) error {
-	handler := plugin.NewDockerLifecycleHandler(getContainers(currentNode))
-	return handler.RemoveRuntime(currentNode)
-}
-
-// NewTezosLifecycleHandler initializes a new instance of TezosLifecycleHandler
-func NewTezosLifecycleHandler() TezosLifecycleHandler {
-	return TezosLifecycleHandler{}
-}
-
-// TezosUpgrader makes use of DockerUpgradeer but calls it with different docker images.
-//
-// See TezosLifecycleHandler for the reasoning
-type TezosUpgrader struct{}
-
-// Upgrade upgrades to a new version of the tezos images
-func (t TezosUpgrader) Upgrade(currentNode node.Node) error {
-	upgrader := plugin.NewDockerUpgrader(getContainers(currentNode))
-	return upgrader.Upgrade(currentNode)
-}
-
-// NewTezosUpgrader initializes a new instance of TezosUpgrader
-func NewTezosUpgrader() TezosUpgrader {
-	return TezosUpgrader{}
-}
-
-// TezosConfigurator makes use of FileConfigurator for rendering config files and adds functionality to create the tezos node identity
-type TezosConfigurator struct {
-	plugin.FileConfigurator
-}
-
-// Configure creates the node identity and configuration files for a new tezos node
-func (t TezosConfigurator) Configure(currentNode node.Node) error {
-	if err := t.FileConfigurator.ValidateParameters(currentNode); err != nil {
-		return err
-	}
-	network := currentNode.StrParameters["network"]
-	if network != "mainnet" && network != "carthagenet" && network != "babylonnet" && network != "zeronet" {
-		return fmt.Errorf("unknown network: %q", network)
-
-	}
-
-	if err := t.FileConfigurator.Configure(currentNode); err != nil {
-		return err
-	}
-
-	identityDir := filepath.Join(currentNode.ConfigsDirectory(), "identity")
-
-	_, err := os.Stat(filepath.Join(identityDir, "identity.json"))
-	if err == nil {
-		fmt.Println("Identity file already exists, skipping creation")
-		return nil
-	}
-
-	// Tezos expects and empty directory to create an identity in
-	if err := os.MkdirAll(identityDir, os.ModePerm); err != nil {
-		return err
-	}
-
-	tezosInitContainer := docker.Container{
-		Name:      tezosInitContainerName,
-		Image:     getContainerImage(network),
-		NetworkID: initNetworkName,
-		Cmd: []string{
-			"tezos-node",
-			"identity",
-			"generate",
-			"--data-dir=/data",
-		},
-		Mounts: []docker.Mount{
-			{
-				Type: "bind",
-				From: identityDir,
-				To:   "/data",
-			},
-		},
-	}
-
-	client, err := docker.NewBasicManager(currentNode.NamePrefix(), currentNode.ConfigsDirectory())
-	if err != nil {
-		return err
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
-	defer cancel()
-
-	if err := client.NetworkExists(ctx, tezosInitContainer.NetworkID); err != nil {
-		return err
-	}
-
-	output, err := client.RunTransientContainer(ctx, tezosInitContainer)
-
-	// err = os.Chown("test.txt", os.Getuid(), os.Getgid())
-	fmt.Println(output)
-
-	return err
-}
-
-// RemoveConfig removes the configuration files of a tezos node
-func (t TezosConfigurator) RemoveConfig(currentNode node.Node) error {
-	if err := t.FileConfigurator.RemoveConfig(currentNode); err != nil {
-		return err
-	}
-
-	identityDir := filepath.Join(currentNode.ConfigsDirectory(), "identity")
-	fmt.Printf("Removing directory %q\n", identityDir)
-	return os.RemoveAll(identityDir)
-}
-
-// NewTezosConfigurator creates a new instance of TezosConfigurator
-func NewTezosConfigurator(configFilesAndTemplates map[string]string, pluginParameters []plugin.Parameter) TezosConfigurator {
-	fileConfigurator := plugin.NewFileConfigurator(map[string]string{
-		tezosCmdFile: tezosCmdTpl,
-	}, pluginParameters)
-
-	return TezosConfigurator{
-		FileConfigurator: fileConfigurator,
-	}
-}
 
 func getContainerImage(network string) string {
 	// TODO: Not all containers are versioned yet but they will be as soon as there are new commits
@@ -195,11 +41,10 @@ func getContainers(currentNode node.Node) []docker.Container {
 	image := getContainerImage(network)
 
 	tezosContainer := docker.Container{
-		Name:      tezosContainerName,
-		Image:     image,
-		CmdFile:   tezosCmdFile,
-		NetworkID: networkName,
-		User:      "root",
+		Name:    tezosContainerName,
+		Image:   image,
+		CmdFile: tezosCmdFile,
+		User:    "root",
 		Mounts: []docker.Mount{
 			{
 				Type: "volume",
@@ -229,61 +74,61 @@ func getContainers(currentNode node.Node) []docker.Container {
 		CollectLogs: true,
 	}
 
-	// TODO: Add collector
+	collectorContainer := docker.Container{
+		Name:        collectorContainerName,
+		Image:       collectorImage,
+		EnvFilename: collectorEnvFile,
+		Mounts: []docker.Mount{
+			{
+				Type: "bind",
+				From: "logs",
+				To:   "/data/nodestate",
+			},
+		},
+		CollectLogs: true,
+	}
 
 	containers := []docker.Container{
 		tezosContainer,
+		collectorContainer,
 	}
 
 	return containers
 }
 
 func main() {
-	tezosTemplates := map[string]string{
-		tezosCmdFile: tezosCmdTpl,
+	templates := map[string]string{
+		tezosCmdFile:     tezosCmdTpl,
+		collectorEnvFile: collectorEnvTpl,
 	}
 
-	meta := plugin.MetaInfo{
-		Version:         version,
-		Description:     "A tezos package",
-		ProtocolVersion: "1.1.0",
-		Parameters: []plugin.Parameter{
-			{
-				Name:        "subtype",
-				Type:        plugin.ParameterTypeString,
-				Description: "The type of node. Only `watcher` supported currently",
-				Mandatory:   false,
-				Default:     "watcher",
-			},
-			{
-				Name:        "network",
-				Type:        plugin.ParameterTypeString,
-				Description: "The network. Can be one of `mainnet`, `carthagenet`, `babylonnet`, `zeronet`",
-				Mandatory:   false,
-				Default:     "mainnet",
-			},
+	parameters := []plugin.Parameter{
+		{
+			Name:        "subtype",
+			Type:        plugin.ParameterTypeString,
+			Description: "The type of node. Only `watcher` supported currently",
+			Mandatory:   false,
+			Default:     "watcher",
 		},
-		Supported: []string{
-			plugin.SupportsTest,
+		{
+			Name:        "network",
+			Type:        plugin.ParameterTypeString,
+			Description: "The network. Can be one of `mainnet`, `carthagenet`, `babylonnet`, `zeronet`",
+			Mandatory:   false,
+			Default:     "mainnet",
 		},
 	}
 
-	lifeCycleHandler := NewTezosLifecycleHandler()
+	description := "A tezos package"
 
-	configurator := NewTezosConfigurator(tezosTemplates, meta.Parameters)
+	containers := []docker.Container{} // Passing in empty containers because we'll replace the container handlers later anyway
 
-	upgrader := NewTezosUpgrader()
-
-	tester := plugin.NewDummyTester()
-
-	tezosPlugin := plugin.NewPlugin(
-		"tezos",
-		meta,
-		configurator,
-		lifeCycleHandler,
-		upgrader,
-		tester,
-	)
+	tezosPlugin := plugin.NewDockerPlugin("tezos", version, description, parameters, templates, containers)
+	// Replace handlers with tezos specific ones
+	tezosPlugin.ParameterValidator = NewTezosParameterValidator(tezosPlugin.Meta().Parameters)
+	tezosPlugin.IdentityCreator = NewTezosIdentityCreator()
+	tezosPlugin.LifecycleHandler = NewTezosLifecycleHandler()
+	tezosPlugin.Upgrader = NewTezosUpgrader()
 
 	plugin.Initialize(tezosPlugin)
 }

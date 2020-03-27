@@ -11,4 +11,7 @@ run
 --data-dir
 /data
 `
+
+	collectorEnvTpl = `SERVICE_PORT=8732
+SERVICE_HOST={{ .Node.NamePrefix }}` + tezosContainerName
 )
