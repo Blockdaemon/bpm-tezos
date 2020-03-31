@@ -18,6 +18,9 @@ const (
 	collectorContainerName = "collector"
 	collectorImage         = "docker.io/blockdaemon/tezos-collector:0.5.0"
 	collectorEnvFile       = "configs/collector.env"
+
+	testContainerName = "tezos-test"
+	testImage         = "docker.io/blockdaemon/tezos-tests:0.9.0"
 )
 
 func getContainerImage(network string) string {
@@ -129,6 +132,7 @@ func main() {
 	tezosPlugin.IdentityCreator = NewTezosIdentityCreator()
 	tezosPlugin.LifecycleHandler = NewTezosLifecycleHandler()
 	tezosPlugin.Upgrader = NewTezosUpgrader()
+	tezosPlugin.Tester = NewTezosTester()
 
 	plugin.Initialize(tezosPlugin)
 }
