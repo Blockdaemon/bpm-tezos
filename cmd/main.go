@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/Blockdaemon/bpm-sdk/pkg/docker"
@@ -27,15 +28,11 @@ func getContainerImage(network string) string {
 	// TODO: Not all containers are versioned yet but they will be as soon as there are new commits
 	// https://gitlab.com/tezos/tezos/issues/682
 	if network == "mainnet" {
-		return "docker.io/tezos/tezos-bare:master_6d2aa96e_20200212132052"
+		return "docker.io/tezos/tezos-bare:mainnet"
 	} else if network == "carthagenet" {
 		return "docker.io/tezos/tezos-bare:carthagenet"
-	} else if network == "babylonnet" {
-		return "docker.io/tezos/tezos-bare:babylonnet"
-	} else if network == "zeronet" {
-		return "docker.io/tezos/tezos-bare:zeronet"
 	} else {
-		panic("Unknown network")
+		panic(fmt.Sprintf("Unknown network: %q", network))
 	}
 }
 
