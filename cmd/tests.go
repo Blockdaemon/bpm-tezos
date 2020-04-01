@@ -37,7 +37,7 @@ func (t TezosTester) Test(currentNode node.Node) (bool, error) {
 	output, err := client.RunTransientContainer(ctx, testContainer)
 	fmt.Println(output)
 
-	success := err != nil
+	success := err == nil
 	return success, err
 
 }
