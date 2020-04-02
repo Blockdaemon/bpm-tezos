@@ -1,5 +1,9 @@
 # 1.1.2
 
+Changes:
+
+* `--data-dir` parameter allows to specify where to store the node data
+
 Bug fixes:
 
 * Now correctly validates the `--network` parameter

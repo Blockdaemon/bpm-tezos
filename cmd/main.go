@@ -47,8 +47,8 @@ func getContainers(currentNode node.Node) []docker.Container {
 		User:    "root",
 		Mounts: []docker.Mount{
 			{
-				Type: "volume",
-				From: tezosDataVolumeName,
+				Type: "bind",
+				From: currentNode.StrParameters["data-dir"],
 				To:   "/data",
 			},
 			{
