@@ -15,7 +15,7 @@ type TezosParameterValidator struct {
 // Validate uses SimpleParameterValidator but also check is the network is correct
 func (t TezosParameterValidator) Validate(currentNode node.Node) error {
 	network := currentNode.StrParameters["network"]
-	if network != "mainnet" && network != "carthagenet" && network != "babylonnet" && network != "zeronet" {
+	if network != "mainnet" && network != "carthagenet" {
 		return fmt.Errorf("unknown network: %q", network)
 	}
 

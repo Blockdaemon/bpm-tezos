@@ -1,3 +1,9 @@
+# 1.1.1
+
+Bug fixes:
+
+* Removed unsupported networks from help text
+
 # 1.1.0
 
 Changes:
