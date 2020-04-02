@@ -21,7 +21,7 @@ const (
 	collectorEnvFile       = "configs/collector.env"
 
 	testContainerName = "tezos-test"
-	testImage         = "docker.io/blockdaemon/tezos-tests:0.9.0"
+	testImage         = "docker.io/blockdaemon/tezos-tests:1.0.0"
 )
 
 func getContainerImage(network string) string {

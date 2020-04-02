@@ -3,6 +3,7 @@
 Bug fixes:
 
 * Now correctly validates the `--network` parameter
+* Fix checkpoint test, it kept failing on mainnet
 
 # 1.1.1
 
