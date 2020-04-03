@@ -113,7 +113,7 @@ func main() {
 		{
 			Name:        "network",
 			Type:        plugin.ParameterTypeString,
-			Description: "The network. Can be one of `mainnet`, `carthagenet`, `babylonnet`, `zeronet`",
+			Description: "The network. Can be either `mainnet` or `carthagenet`",
 			Mandatory:   false,
 			Default:     "mainnet",
 		},
