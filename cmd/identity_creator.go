@@ -3,17 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/Blockdaemon/bpm-sdk/pkg/docker"
-	"github.com/Blockdaemon/bpm-sdk/pkg/node"
+	"go.blockdaemon.com/bpm/sdk/pkg/docker"
+	"go.blockdaemon.com/bpm/sdk/pkg/node"
 )
 
 const (
-	tezosInitContainerName = "tezos-init"
-	identityDirectory      = "identity"
+	tezosInitContainerName  = "tezos-init"
+	identityDirectory       = "identity"
+	identityConfigDirectory = "identity-config"
 )
 
 // TezosIdentityCreator provides functions to create and remove the identity (e.g. private keys) of a node
@@ -21,16 +23,9 @@ type TezosIdentityCreator struct{}
 
 // CreateIdentity creates the identity of a node
 func (t TezosIdentityCreator) CreateIdentity(currentNode node.Node) error {
-	identityPath := filepath.Join(currentNode.NodeDirectory(), identityDirectory)
-
-	// network := currentNode.StrParameters["network"]
-	// if network != "mainnet" && network != "carthagenet" && network != "babylonnet" && network != "zeronet" {
-	// 	return fmt.Errorf("unknown network: %q", network)
-
-	// }
-
 	// Create identity directory if it doesn't exist yet
-	if err := os.MkdirAll(identityPath, os.ModePerm); err != nil {
+	identityPath := filepath.Join(currentNode.NodeDirectory(), identityDirectory)
+	if err := os.MkdirAll(identityPath, os.FileMode(0750)); err != nil {
 		return err
 	}
 
@@ -41,36 +36,57 @@ func (t TezosIdentityCreator) CreateIdentity(currentNode node.Node) error {
 		return nil
 	}
 
+	// Write a minimal configuration file to configure the network for the identity creation
+	// We cannot use the real configuration file because it gets created after the identity
+	// { "data-dir": "//home/tezos/.tezos-node/", "p2p": {}, "network": "carthagenet" }
+	identityConfigPath := filepath.Join(currentNode.NodeDirectory(), identityConfigDirectory)
+	if err := os.MkdirAll(identityConfigPath, os.FileMode(0750)); err != nil {
+		return err
+	}
+	minimalConfig := filepath.Join(identityConfigPath, "minimal-config.json")
+
+	content := []byte(fmt.Sprintf(`{"p2p": {}, "network": "%s"}`, currentNode.StrParameters["network"]))
+	fmt.Println(minimalConfig)
+	if err := ioutil.WriteFile(minimalConfig, content, os.FileMode(0600)); err != nil {
+		return err
+	}
+	time.Sleep(time.Duration(300) * time.Second)
+
 	// Run container to create an identity
 	tezosInitContainer := docker.Container{
 		Name:  tezosInitContainerName,
-		Image: getContainerImage(currentNode.StrParameters["network"]),
+		Image: tezosImage,
 		User:  "root",
 		Cmd: []string{
 			"tezos-node",
 			"identity",
 			"generate",
-			"--data-dir=/data",
+			"--config",
+			"/config/minimal-config.json",
+			"--data-dir",
+			"/identity",
 		},
 		Mounts: []docker.Mount{
 			{
 				Type: "bind",
 				From: identityPath,
-				To:   "/data",
+				To:   "/identity",
+			},
+			{
+				Type: "bind",
+				From: identityConfigPath,
+				To:   "/config",
 			},
 		},
 	}
 
+	// client, err := docker.InitializeClient(currentNode)
 	client, err := docker.InitializeClient(currentNode)
 	if err != nil {
 		return err
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
-
-	if err := client.NetworkExists(ctx, currentNode.StrParameters["docker-network"]); err != nil {
-		return err
-	}
 
 	output, err := client.RunTransientContainer(ctx, tezosInitContainer)
 	fmt.Println(output)

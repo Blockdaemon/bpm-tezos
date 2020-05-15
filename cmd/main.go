@@ -1,20 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"path/filepath"
 
-	"github.com/Blockdaemon/bpm-sdk/pkg/docker"
-	"github.com/Blockdaemon/bpm-sdk/pkg/node"
-	"github.com/Blockdaemon/bpm-sdk/pkg/plugin"
+	"go.blockdaemon.com/bpm/sdk/pkg/docker"
+	"go.blockdaemon.com/bpm/sdk/pkg/plugin"
 )
 
 var version string
 
 const (
 	tezosContainerName  = "tezos"
+	tezosImage          = "docker.io/tezos/tezos-bare:latest-release_4053147f_20200506134713" // This is version 7.0 https://tezos-baking.slack.com/archives/CAHL22STT/p1588774642016000
 	tezosDataVolumeName = "tezos-data"
-	tezosCmdFile        = "configs/tezos.dockercmd"
+	tezosConfigFile     = "configs/config.json"
 
 	collectorContainerName = "collector"
 	collectorImage         = "docker.io/blockdaemon/tezos-collector:0.5.0"
@@ -24,31 +23,27 @@ const (
 	testImage         = "docker.io/blockdaemon/tezos-tests:1.0.0"
 )
 
-func getContainerImage(network string) string {
-	// TODO: Not all containers are versioned yet but they will be as soon as there are new commits
-	// https://gitlab.com/tezos/tezos/issues/682
-	if network == "mainnet" {
-		return "docker.io/tezos/tezos-bare:mainnet"
-	} else if network == "carthagenet" {
-		return "docker.io/tezos/tezos-bare:carthagenet"
-	} else {
-		panic(fmt.Sprintf("Unknown network: %q", network))
-	}
-}
-
-func getContainers(currentNode node.Node) []docker.Container {
-	network := currentNode.StrParameters["network"]
-	image := getContainerImage(network)
-
+func getContainers() []docker.Container {
 	tezosContainer := docker.Container{
-		Name:    tezosContainerName,
-		Image:   image,
-		CmdFile: tezosCmdFile,
-		User:    "root",
+		Name:  tezosContainerName,
+		Image: tezosImage,
+		Cmd: []string{
+			"tezos-node",
+			"run",
+			"--config",
+			"/config/config.json",
+		},
+		User: "root",
 		Mounts: []docker.Mount{
 			{
 				Type: "bind",
-				From: currentNode.StrParameters["data-dir"],
+				From: "configs/config.json",
+				To:   "/config/config.json",
+			},
+			{
+				Type: "bind",
+				// From: "{{ index .Node.StrParameters \"data-dir\" }}",
+				From: "data",
 				To:   "/data",
 			},
 			{
@@ -98,7 +93,7 @@ func getContainers(currentNode node.Node) []docker.Container {
 
 func main() {
 	templates := map[string]string{
-		tezosCmdFile:     tezosCmdTpl,
+		tezosConfigFile:  tezosConfigTpl,
 		collectorEnvFile: collectorEnvTpl,
 	}
 
@@ -120,15 +115,11 @@ func main() {
 	}
 
 	description := "A tezos package"
-
-	containers := []docker.Container{} // Passing in empty containers because we'll replace the container handlers later anyway
+	containers := getContainers()
 
 	tezosPlugin := plugin.NewDockerPlugin("tezos", version, description, parameters, templates, containers)
-	// Replace handlers with tezos specific ones
 	tezosPlugin.ParameterValidator = NewTezosParameterValidator(tezosPlugin.Meta().Parameters)
 	tezosPlugin.IdentityCreator = NewTezosIdentityCreator()
-	tezosPlugin.LifecycleHandler = NewTezosLifecycleHandler()
-	tezosPlugin.Upgrader = NewTezosUpgrader()
 	tezosPlugin.Tester = NewTezosTester()
 
 	plugin.Initialize(tezosPlugin)

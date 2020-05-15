@@ -1,15 +1,25 @@
 package main
 
 const (
-	tezosCmdTpl = `tezos-node
-run
---bootstrap-threshold=10
---net-addr=0.0.0.0:9732
---history-mode=full
---cors-origin=*
---rpc-addr=0.0.0.0:8732
---data-dir
-/data
+	// Originally generated using the `tezos-node config init` command
+	tezosConfigTpl = `{
+	"data-dir": "/data",
+	"rpc": {
+		"listen-addrs": [
+			"0.0.0.0:8732"
+		],
+		"cors-origin": [
+			"*"
+		]
+	},
+	"p2p": {
+		"listen-addr": "0.0.0.0:9732"
+	},
+	"shell": {
+		"history_mode": "full"
+	},
+	"network": "{{ .Node.StrParameters.network }}"
+	}	
 `
 
 	collectorEnvTpl = `SERVICE_PORT=8732

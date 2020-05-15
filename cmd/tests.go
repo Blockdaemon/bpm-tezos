@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Blockdaemon/bpm-sdk/pkg/docker"
-	"github.com/Blockdaemon/bpm-sdk/pkg/node"
+	"go.blockdaemon.com/bpm/sdk/pkg/docker"
+	"go.blockdaemon.com/bpm/sdk/pkg/node"
 )
 
 // TezosTester tests a tezos node
@@ -26,6 +26,7 @@ func (t TezosTester) Test(currentNode node.Node) (bool, error) {
 		},
 	}
 
+	// client, err := docker.InitializeClient(currentNode)
 	client, err := docker.InitializeClient(currentNode)
 	if err != nil {
 		return false, err

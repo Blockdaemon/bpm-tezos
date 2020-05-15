@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/Blockdaemon/bpm-sdk/pkg/node"
-	"github.com/Blockdaemon/bpm-sdk/pkg/plugin"
+	"go.blockdaemon.com/bpm/sdk/pkg/node"
+	"go.blockdaemon.com/bpm/sdk/pkg/plugin"
 )
 
 // TezosParameterValidator validates Tezos parameters
@@ -14,6 +14,10 @@ type TezosParameterValidator struct {
 
 // ValidateParameters uses SimpleParameterValidator but also check is the network is correct
 func (t TezosParameterValidator) ValidateParameters(currentNode node.Node) error {
+	if err := t.SimpleParameterValidator.ValidateParameters(currentNode); err != nil {
+		return err
+	}
+
 	network := currentNode.StrParameters["network"]
 	if network != "mainnet" && network != "carthagenet" {
 		return fmt.Errorf("unknown network: %q", network)
