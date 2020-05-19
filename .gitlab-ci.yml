@@ -3,7 +3,7 @@ stages:
   - build
 
 check:
-  image: golangci/golangci-lint:v1.15
+  image: golangci/golangci-lint:v1.27
   stage: check
   script:
     - make check
@@ -13,7 +13,3 @@ build:
   stage: build
   script:
     - make build
-  artifacts:
-    untracked: true
-    paths:
-      - bin/

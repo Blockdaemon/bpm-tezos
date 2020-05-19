@@ -1,0 +1,8 @@
+export PLUGIN_NAME=tezos
+export MAINTAINER=Blockdaemon
+export MAINTAINER_HOMEPAGE=https://blockdaemon.com
+export MAINTAINER_EMAIL=support@blockdaemon.com
+export SIGNING_KEY_IDENTIFIER=support@blockdaemon.com
+export GITLAB_OWNER=blockdaemon
+export GITLAB_REPO=bpm-tezos
+
