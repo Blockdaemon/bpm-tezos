@@ -81,7 +81,7 @@ func (t TezosIdentityCreator) CreateIdentity(currentNode node.Node) error {
 	}
 
 	// client, err := docker.InitializeClient(currentNode)
-	client, err := docker.InitializeClient(currentNode)
+	client, err := docker.NewBasicManager(currentNode)
 	if err != nil {
 		return err
 	}

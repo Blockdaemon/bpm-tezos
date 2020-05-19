@@ -27,7 +27,7 @@ func (t TezosTester) Test(currentNode node.Node) (bool, error) {
 	}
 
 	// client, err := docker.InitializeClient(currentNode)
-	client, err := docker.InitializeClient(currentNode)
+	client, err := docker.NewBasicManager(currentNode)
 	if err != nil {
 		return false, err
 	}

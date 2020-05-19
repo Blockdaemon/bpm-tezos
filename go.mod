@@ -1,10 +1,7 @@
-module go.blockdaemon.com/bpm/tezos
+module gitlab.com/blockdaemon/bpm-tezos
 
-go 1.13
+go 1.14
 
-require (
-	github.com/Microsoft/go-winio v0.4.14 // indirect
-	go.blockdaemon.com/bpm/sdk v0.0.0-00010101000000-000000000000
-)
+require go.blockdaemon.com/bpm/sdk v0.13.0
 
 replace go.blockdaemon.com/bpm/sdk => ../bpm-sdk

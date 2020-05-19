@@ -10,10 +10,9 @@ import (
 var version string
 
 const (
-	tezosContainerName  = "tezos"
-	tezosImage          = "docker.io/tezos/tezos-bare:latest-release_4053147f_20200506134713" // This is version 7.0 https://tezos-baking.slack.com/archives/CAHL22STT/p1588774642016000
-	tezosDataVolumeName = "tezos-data"
-	tezosConfigFile     = "configs/config.json"
+	tezosContainerName = "tezos"
+	tezosImage         = "docker.io/tezos/tezos-bare:latest-release_4053147f_20200506134713" // This is version 7.0 https://tezos-baking.slack.com/archives/CAHL22STT/p1588774642016000
+	tezosConfigFile    = "configs/config.json"
 
 	collectorContainerName = "collector"
 	collectorImage         = "docker.io/blockdaemon/tezos-collector:0.5.0"
