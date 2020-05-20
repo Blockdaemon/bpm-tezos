@@ -14,6 +14,7 @@ builds:
   goarch:
     - amd64
     - 386
+  binary: tezos
 signs:
   - artifacts: all
     args: ["-u", "support@blockdaemon.com", "--output", "${signature}", "--detach-sign", "${artifact}"]
@@ -25,6 +26,6 @@ changelog:
     - '^test:'
 release:
   gitlab:
-    owner: 
-    name: 
+    owner: blockdaemon
+    name: bpm-tezos
 
