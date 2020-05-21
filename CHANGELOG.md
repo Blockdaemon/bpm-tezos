@@ -1,3 +1,10 @@
+# 1.2.0
+
+### Features
+
+* support monitoring packs ([8e44ecd](https://gitlab.com/Blockdaemon/bpm-tezos/commit/8e44ecdbf66fb1f40bb7e1e3d45afa7e5912ba5d))
+* upgrade to tezos 7.0 ([92be16c](https://gitlab.com/Blockdaemon/bpm-tezos/commit/92be16ccdf6d0f31efa30945bf965f71bf97c735))
+
 # 1.1.3
 
 Bug fixes:
