@@ -11,7 +11,7 @@ var version string
 
 const (
 	tezosContainerName = "tezos"
-	tezosImage         = "docker.io/tezos/tezos-bare:latest-release_4053147f_20200506134713" // This is version 7.0 https://tezos-baking.slack.com/archives/CAHL22STT/p1588774642016000
+	tezosImage         = "docker.io/tezos/tezos-bare:latest-release_51977265_20200519150752" // This is version 7.1: https://tezos-baking.slack.com/archives/CAHL22STT/p1589899117024600
 	tezosConfigFile    = "configs/config.json"
 
 	collectorContainerName = "collector"
