@@ -41,8 +41,7 @@ func getContainers() []docker.Container {
 			},
 			{
 				Type: "bind",
-				// From: "{{ index .Node.StrParameters \"data-dir\" }}",
-				From: "data",
+				From: "{{ index .Node.StrParameters \"data-dir\" }}",
 				To:   "/data",
 			},
 			{
