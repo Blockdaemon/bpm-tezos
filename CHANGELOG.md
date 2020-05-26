@@ -1,3 +1,12 @@
+# 1.3.1
+
+
+### Bug Fixes
+
+* now supports `--data-dir` - it was hardcoded to `data` ([4c396e9](https://gitlab.com/Blockdaemon/bpm-tezos/commit/4c396e954132f199fc2bb15b998dc5100c625d6c))
+
+
+
 # 1.3.0
 
 
