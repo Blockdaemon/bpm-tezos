@@ -1,3 +1,12 @@
+# 1.3.2
+
+
+### Bug Fixes
+
+* creating identity sometimes timed out ([b47afd7](https://gitlab.com/Blockdaemon/bpm-tezos/commit/b47afd72dad7df6a39a1e1a48387279668d02df1))
+
+
+
 # 1.3.1
 
 
