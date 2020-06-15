@@ -50,7 +50,7 @@ func (t TezosIdentityCreator) CreateIdentity(currentNode node.Node) error {
 	if err := ioutil.WriteFile(minimalConfig, content, os.FileMode(0600)); err != nil {
 		return err
 	}
-	time.Sleep(time.Duration(300) * time.Second)
+	time.Sleep(time.Duration(600) * time.Second)
 
 	// Run container to create an identity
 	tezosInitContainer := docker.Container{
