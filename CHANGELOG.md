@@ -1,3 +1,12 @@
+# 1.3.3
+
+
+### Bug Fixes
+
+* use the official term `full` instead of `watcher` ([1b74877](https://gitlab.com/Blockdaemon/bpm-tezos/commit/1b748774ad3b4c140b30368294c318e25a8d0256))
+
+
+
 # 1.3.2
 
 
