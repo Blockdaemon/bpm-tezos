@@ -99,9 +99,9 @@ func main() {
 		{
 			Name:        "subtype",
 			Type:        plugin.ParameterTypeString,
-			Description: "The type of node. Only `watcher` supported currently",
+			Description: "The type of node. Only `full` supported currently",
 			Mandatory:   false,
-			Default:     "watcher",
+			Default:     "full",
 		},
 		{
 			Name:        "network",
