@@ -1,3 +1,20 @@
+# 7.2.0-1
+
+With this release we are switching the version scheme to <tezos-version>-<package-iteration>. This allows human operators to quickly see
+which tezos versino they are running.
+
+
+### Bug Fixes
+
+* clarify in the description what this package can do ([9d4c684](https://gitlab.com/Blockdaemon/bpm-tezos/commit/9d4c684a44a96e64958dc1103d6621256d0277d4))
+
+
+### Features
+
+* upgrade to tezos v7.2. ([66036d7](https://gitlab.com/Blockdaemon/bpm-tezos/commit/66036d7bb870087466424d2be86846976f4423eb))
+
+
+
 # 1.3.3
 
 
