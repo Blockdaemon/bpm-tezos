@@ -112,7 +112,7 @@ func main() {
 		},
 	}
 
-	description := "A tezos package"
+	description := "Tezos full node package"
 	containers := getContainers()
 
 	tezosPlugin := plugin.NewDockerPlugin("tezos", version, description, parameters, templates, containers)
