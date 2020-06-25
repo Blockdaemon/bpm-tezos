@@ -46,11 +46,9 @@ func (t TezosIdentityCreator) CreateIdentity(currentNode node.Node) error {
 	minimalConfig := filepath.Join(identityConfigPath, "minimal-config.json")
 
 	content := []byte(fmt.Sprintf(`{"p2p": {}, "network": "%s"}`, currentNode.StrParameters["network"]))
-	fmt.Println(minimalConfig)
 	if err := ioutil.WriteFile(minimalConfig, content, os.FileMode(0600)); err != nil {
 		return err
 	}
-	time.Sleep(time.Duration(600) * time.Second)
 
 	// Run container to create an identity
 	tezosInitContainer := docker.Container{
