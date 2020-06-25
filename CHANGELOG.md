@@ -1,3 +1,12 @@
+# 7.2.0-2
+
+
+### Bug Fixes
+
+* bpm-tezos sometimes times out ([b129480](https://gitlab.com/Blockdaemon/bpm-tezos/commit/b1294802cb3e4e97f6d5c89ec33cb6931737298b))
+
+
+
 # 7.2.0-1
 
 With this release we are switching the version scheme to <tezos-version>-<package-iteration>. This allows human operators to quickly see
