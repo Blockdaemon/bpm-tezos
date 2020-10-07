@@ -11,7 +11,7 @@ var version string
 
 const (
 	tezosContainerName = "tezos"
-	tezosImage         = "docker.io/tezos/tezos-bare:v7.3"
+	tezosImage         = "docker.io/tezos/tezos-bare:v7.4"
 	tezosConfigFile    = "configs/config.json"
 
 	collectorContainerName = "collector"
