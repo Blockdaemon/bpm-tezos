@@ -1,3 +1,11 @@
+# 7.4.0-1
+
+
+### Features
+
+* upgrade to tezos v7.4 ([96abe9ad](https://gitlab.com/Blockdaemon/bpm-tezos/-/commit/96abe9ad6c0beb5db53eb75dbb992860bd2f875f))
+
+
 # 7.3.0-1
 
 
